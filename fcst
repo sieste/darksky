@@ -1,0 +1,141 @@
+#!/usr/bin/env python2
+
+import urllib2
+import json
+import time
+import datetime
+import ConfigParser
+import sys
+import os
+
+if len(sys.argv) < 2:
+	mode = "rain"
+else:
+	mode = sys.argv[1]
+
+
+
+# initialize config file parser
+conffile = os.path.expanduser("~/.pyfcio.conf")
+config = ConfigParser.ConfigParser()
+
+# load config file
+if os.path.isfile(conffile):
+	config.read(conffile)
+else:
+	print "No config file " + conffile + " found. Please create one first ... exiting" 
+	sys.exit()
+
+# get forecast.io id
+if config.has_option("Settings", "forecastioId"):
+	forecastioId = config.get("Settings", "forecastioId")
+else:
+	print "Please provide variable `forecastioId` under section [Settings] in file ~/.pyfcio ... exiting"
+	sys.exit()
+
+# get latitude and longitude
+if (config.has_option("Settings", "lat") & 
+    config.has_option("Settings", "lon")):
+	lat = config.get("Settings", "lat")
+	lon = config.get("Settings", "lon")
+else:
+	print "Please provide variables `lat` and `lon` under section [Settings] in file ~/.pyfcio ... exiting"
+	sys.exit()
+
+# download forecast.io json file if last file is more 
+# than about 2 minutes old
+jsonfile = "/tmp/forecastio-"+str(int(time.time()/120))+".json"
+if not(os.path.isfile(jsonfile)):
+	url = ('https://api.forecast.io/forecast/' + forecastioId
+	       + '/' + str(lat) + ',' + str(lon))
+	response = urllib2.urlopen(url)
+	fcstData = response.read()
+	with open(jsonfile, 'wb') as jsonFile:
+		jsonFile.write(fcstData)
+
+# open json file
+with open(jsonfile, 'r') as jsonFile:
+	data = json.load(jsonFile)
+
+
+if mode == "rain":
+	# get precip data from json file
+	precipProb = []
+	precipIntensity = []
+	fcsttime = []
+	for d in data["minutely"]["data"]:
+		precipProb.append(d["precipProbability"])
+		precipIntensity.append(d["precipIntensity"])
+		fcsttime.append(d["time"])
+	
+	# create plot matrix
+	width = 61
+	height = 17
+	
+	plotmat = [[" " for i in xrange(width)] for i in xrange(height)]
+	for i in xrange(width):
+		ppr = precipProb[i]
+		plotmat[int(round(ppr * (height-1)))][i] = "*"
+	
+	# add line above and below plot
+	plotmat.insert(0, ["-" for i in xrange(len(plotmat[0]))])
+	plotmat.append(["-" for i in xrange(len(plotmat[0]))])
+	
+	# add x axis ticks
+	inds = [15, 30, 45]
+	for i in inds:
+		plotmat[0][i] = "|"
+	
+	# add x axis labels
+	plotmat.insert(0, [" " for i in xrange(len(plotmat[0]))])
+	for i in inds:
+		plotmat[0][i:(i+2)] = list(str(i))
+	
+	# add left and right border
+	plotmat[len(plotmat)-1].insert(0, " ")
+	plotmat[1].insert(0," ")
+	for i in xrange(2,len(plotmat)-1):
+		plotmat[i].insert(0,"|")
+		plotmat[i].append("|")
+	
+	# add y axis ticks and labels
+	for i in xrange(len(plotmat)):
+		for j in xrange(5):
+			plotmat[i].insert(0," ")
+	
+	plotmat[2][0:6] = list('0.0  :')
+	plotmat[6][0:6] = list('0.25 :')
+	plotmat[10][0:6] = list('0.5  :')
+	plotmat[14][0:6] = list('0.75 :')
+	plotmat[18][0:6] = list('1.0  :')
+	
+	plotmat[2][67] = ':'
+	plotmat[6][67] = ':'
+	plotmat[10][67] = ':'
+	plotmat[14][67] = ':'
+	plotmat[18][67] = ':'
+	
+	# get head line
+	if config.has_option("Settings", "rainheader"):
+		rainheader = config.get("Settings", "rainheader")
+	else:
+		rainheader = "Probability of precipitation for lat " + str(lat) + ", lon " + str(lon)
+	
+	# print the result
+	print ""
+	print ""
+	print "      "+rainheader
+	print ""
+	
+	for i in reversed(xrange(len(plotmat))):
+		print ''.join(plotmat[i])
+	
+	print "                             lead time [min]"
+	print "     t_0 = " + datetime.datetime.fromtimestamp(fcsttime[0] + time.timezone).strftime('%H:%M') + '                                  (www.forecast.io)' 
+	print ""
+	
+else:
+	print "unknown mode: "+mode+" ... exiting"
+	sys.exit()
+	
+	
