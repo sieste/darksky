@@ -30,7 +30,7 @@ else:
 if config.has_option("Settings", "forecastioApiKey"):
 	forecastioApiKey = config.get("Settings", "forecastioApiKey")
 else:
-	print "Please provide variable `forecastioApiKey` under section [Settings] in file ~/.pyfcio ... exiting"
+	print "Please provide variable `forecastioApiKey` under section [Settings] in file " + conffile + " ... exiting"
 	sys.exit()
 
 # get latitude and longitude
@@ -39,7 +39,7 @@ if (config.has_option("Settings", "lat") &
 	lat = config.get("Settings", "lat")
 	lon = config.get("Settings", "lon")
 else:
-	print "Please provide variables `lat` and `lon` under section [Settings] in file ~/.pyfcio ... exiting"
+	print "Please provide variables `lat` and `lon` under section [Settings] in file " + conffile + " ... exiting"
 	sys.exit()
 
 # download forecast.io json file if last file is more 
