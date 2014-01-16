@@ -6,6 +6,7 @@
 * create a [forecast.io account](https://developer.forecast.io/register)
 * create the file `.pyfcio.conf` in your home directory with the following contents:
 
+
     [Settings]
     forecastioId: yOUr_foRecAST_dOt_Io_Id
     lat: 50.7166
