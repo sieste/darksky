@@ -3,7 +3,7 @@
 ### Install and config ###
 
 * download the file `fcst.py` and make it executable
-* create a forecast.io account [here](https://developer.forecast.io/register)
+* create a forecast.io account [here](https://developer.forecast.io/register) to get a forecast.io id
 * create the file `.pyfcio.conf` in your home directory with the following options:
 
 ```
