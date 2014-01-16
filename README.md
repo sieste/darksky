@@ -26,7 +26,7 @@ rainheader: Probability of precipitation for Exeter, Devon, UK
 Currently, only the option `rain` is implemented. So the command 
 
 ```
-fcst.py rain
+./fcst.py rain
 ```
 
 will produce output similar to
