@@ -2,9 +2,9 @@
 
 ### Install and config ###
 
-* download the file `fcst.py` and make it executable
+* download the executable `fcst.py` 
 * create a forecast.io account [here](https://developer.forecast.io/register) to get a forecast.io id
-* create the file `.pyfcio.conf` in your home directory with the following options:
+* create the file `.pyfcio.conf` in your home directory with the following options (adjusted to your location):
 
 ```
 [Settings]
@@ -13,6 +13,8 @@ lat: 50.7166
 lon: -3.5333
 rainheader: Probability of precipitation for Exeter, Devon, UK
 ```
+
+
 
 ### Usage ###
 
