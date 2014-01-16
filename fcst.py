@@ -131,7 +131,7 @@ if mode == "rain":
 		print ''.join(plotmat[i])
 	
 	print "                             lead time [min]"
-	print "     t_0 = " + datetime.datetime.fromtimestamp(fcsttime[0] + time.timezone).strftime('%H:%M') + '                                  (www.forecast.io)' 
+	print "     t_0 = " + datetime.datetime.fromtimestamp(fcsttime[0] + time.timezone).strftime('%H:%M') + '                             (src: www.forecast.io)' 
 	print ""
 	
 else:
