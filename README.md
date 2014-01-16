@@ -1,9 +1,14 @@
 ## pyfcio: Command line weather forecasts from forecast.io ##
 
+### Requirements ###
+
+* Python2
+* an ID for the forecast.io API (register [here](https://developer.forecast.io/register))
+* tested under Arch Linux (3.12.7)
+
 ### Install and config ###
 
 * download the executable `fcst.py` 
-* create a forecast.io account [here](https://developer.forecast.io/register) to get a forecast.io id
 * create the file `.pyfcio.conf` in your home directory with the following options (adjusted to your location):
 
 ```
