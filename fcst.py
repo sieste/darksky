@@ -26,11 +26,11 @@ else:
 	print "No config file " + conffile + " found. Please create one first ... exiting" 
 	sys.exit()
 
-# get forecast.io id
-if config.has_option("Settings", "forecastioId"):
-	forecastioId = config.get("Settings", "forecastioId")
+# get forecast.io api key
+if config.has_option("Settings", "forecastioApiKey"):
+	forecastioApiKey = config.get("Settings", "forecastioApiKey")
 else:
-	print "Please provide variable `forecastioId` under section [Settings] in file ~/.pyfcio ... exiting"
+	print "Please provide variable `forecastioApiKey` under section [Settings] in file ~/.pyfcio ... exiting"
 	sys.exit()
 
 # get latitude and longitude
@@ -46,7 +46,7 @@ else:
 # than about 2 minutes old
 jsonfile = "/tmp/forecastio-"+str(int(time.time()/120))+".json"
 if not(os.path.isfile(jsonfile)):
-	url = ('https://api.forecast.io/forecast/' + forecastioId
+	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
 	       + '/' + str(lat) + ',' + str(lon))
 	response = urllib2.urlopen(url)
 	fcstData = response.read()

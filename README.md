@@ -3,7 +3,7 @@
 ### Requirements ###
 
 * Python2
-* an ID for the forecast.io API (register [here](https://developer.forecast.io/register))
+* a forecast.io API Key (register [here](https://developer.forecast.io/register))
 * tested under Arch Linux (3.12.7)
 
 ### Install and config ###
@@ -13,7 +13,7 @@
 
 ```
 [Settings]
-forecastioId: yOUr_foRecAST_dOt_Io_Id
+forecastioApiKey: yOUr_foRecAST_dOt_Io_Api_Key
 lat: 50.7166
 lon: -3.5333
 rainheader: Probability of precipitation for Exeter, Devon, UK
