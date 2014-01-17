@@ -42,10 +42,22 @@ else:
 	print "Please provide variables `lat` and `lon` under section [Settings] in file " + conffile + " ... exiting"
 	sys.exit()
 
-# download forecast.io json file if last file is more 
-# than about 2 minutes old
-jsonfile = "/tmp/forecastio-"+str(int(time.time()/120))+".json"
-if not(os.path.isfile(jsonfile)):
+# get downloadIfOlder option
+if (config.has_option("Settings", "downloadIfOlder")):
+	downloadIfOlder = config.get("Settings", "downloadIfOlder")
+else:
+	downloadIfOlder = 120
+
+# set json filename
+if (config.has_option("Settings", "jsonFile")):
+	jsonFile = config.get("Settings", "jsonFile")
+else:
+	jsonfile = "/tmp/forecastio.json"
+
+# download json file if file doesn't exist or if file is more 
+# than `downloadIfOlder` seconds old
+if (not(os.path.isfile(jsonfile)) or
+    (time.time() - os.path.getmtime(jsonfile) > downloadIfOlder)):
 	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
 	       + '/' + str(lat) + ',' + str(lon))
 	response = urllib2.urlopen(url)

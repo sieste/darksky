@@ -17,6 +17,8 @@ forecastioApiKey: yOUr_foRecAST_dOt_Io_Api_Key
 lat: 50.7166
 lon: -3.5333
 rainheader: Probability of precipitation for Exeter, Devon, UK
+downloadIfOlder: 120
+jsonFile: /tmp/forecastio.json
 ```
 
 
