@@ -44,7 +44,7 @@ else:
 
 # get downloadIfOlder option
 if (config.has_option("Settings", "downloadIfOlder")):
-	downloadIfOlder = config.get("Settings", "downloadIfOlder")
+	downloadIfOlder = float(config.get("Settings", "downloadIfOlder"))
 else:
 	downloadIfOlder = 120
 
@@ -61,7 +61,7 @@ if not(os.path.isfile(jsonfilename)):
 	downloadnew = True
 elif (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder):
 	downloadnew = True
-    
+
 if downloadnew:
 	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
 	       + '/' + str(lat) + ',' + str(lon))
