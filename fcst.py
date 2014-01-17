@@ -82,14 +82,17 @@ if mode == "rain":
 	plotmat.append(["-" for i in xrange(len(plotmat[0]))])
 	
 	# add x axis ticks
-	inds = [15, 30, 45]
-	for i in inds:
+	for i in [0, 15, 30, 45]:
 		plotmat[0][i] = "|"
 	
 	# add x axis labels
+	t0 = datetime.datetime.fromtimestamp(fcsttime[0] 
+	     + time.timezone).strftime('%H:%M')
 	plotmat.insert(0, [" " for i in xrange(len(plotmat[0]))])
-	for i in inds:
-		plotmat[0][i:(i+2)] = list(str(i))
+	plotmat[0][0:6] = list(t0)
+	plotmat[0][16:(16+8)] = list('+15min')
+	plotmat[0][31:(31+8)] = list('+30min')
+	plotmat[0][46:(46+8)] = list('+45min')
 	
 	# add left and right border
 	plotmat[len(plotmat)-1].insert(0, " ")
@@ -115,23 +118,18 @@ if mode == "rain":
 	plotmat[14][67] = ':'
 	plotmat[18][67] = ':'
 	
-	# get head line
-	if config.has_option("Settings", "rainheader"):
-		rainheader = config.get("Settings", "rainheader")
-	else:
-		rainheader = "Probability of precipitation for lat " + str(lat) + ", lon " + str(lon)
 	
 	# print the result
 	print ""
-	print ""
-	print "      "+rainheader
+	if config.has_option("Settings", "rainheader"):
+		rainheader = config.get("Settings", "rainheader")
+		print '      ' + rainheader
 	print ""
 	
 	for i in reversed(xrange(len(plotmat))):
 		print ''.join(plotmat[i])
 	
-	print "                             lead time [min]"
-	print "     t_0 = " + datetime.datetime.fromtimestamp(fcsttime[0] + time.timezone).strftime('%H:%M') + '                             (src: www.forecast.io)' 
+	print ''.join([' ' for i in xrange(46)]) + '(src: www.forecast.io)'
 	print ""
 	
 else:
