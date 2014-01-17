@@ -50,16 +50,16 @@ else:
 
 # set json filename
 if (config.has_option("Settings", "jsonFile")):
-	jsonFile = config.get("Settings", "jsonFile")
+	jsonfilename = config.get("Settings", "jsonFile")
 else:
-	jsonfile = "/tmp/forecastio.json"
+	jsonfilename = "/tmp/forecastio.json"
 
 # download json file if file doesn't exist or if file is more 
 # than `downloadIfOlder` seconds old
 downloadnew = False
-if not(os.path.isfile(jsonfile)):
+if not(os.path.isfile(jsonfilename)):
 	downloadnew = True
-elif (time.time() - os.path.getmtime(jsonfile) > downloadIfOlder):
+elif (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder):
 	downloadnew = True
     
 if downloadnew:
@@ -67,11 +67,11 @@ if downloadnew:
 	       + '/' + str(lat) + ',' + str(lon))
 	response = urllib2.urlopen(url)
 	fcstData = response.read()
-	with open(jsonfile, 'wb') as jsonFile:
+	with open(jsonfilename, 'wb') as jsonFile:
 		jsonFile.write(fcstData)
 
 # open json file
-with open(jsonfile, 'r') as jsonFile:
+with open(jsonfilename, 'r') as jsonFile:
 	data = json.load(jsonFile)
 
 
