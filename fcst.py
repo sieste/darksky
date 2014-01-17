@@ -14,7 +14,6 @@ else:
 	mode = sys.argv[1]
 
 
-
 # initialize config file parser
 conffile = os.path.expanduser("~/.pyfcio.conf")
 config = ConfigParser.ConfigParser()
@@ -47,6 +46,12 @@ if (config.has_option("Settings", "downloadIfOlder")):
 	downloadIfOlder = float(config.get("Settings", "downloadIfOlder"))
 else:
 	downloadIfOlder = 120
+
+# plot height
+if (config.has_option("Settings", "plotsize")):
+	plotsize = int(config.get("Settings", "plotsize"))
+else:
+	plotsize = 2
 
 # set json filename
 if (config.has_option("Settings", "jsonFile")):
@@ -87,7 +92,8 @@ if mode == "rain":
 	
 	# create plot matrix
 	width = 61
-	height = 17
+	plotsize = 2
+	height = 5 + plotsize * 4
 	
 	plotmat = [[" " for i in xrange(width)] for i in xrange(height)]
 	for i in xrange(width):
@@ -123,18 +129,10 @@ if mode == "rain":
 		for j in xrange(5):
 			plotmat[i].insert(0," ")
 	
-	plotmat[2][0:6] = list('0.0  :')
-	plotmat[6][0:6] = list('0.25 :')
-	plotmat[10][0:6] = list('0.5  :')
-	plotmat[14][0:6] = list('0.75 :')
-	plotmat[18][0:6] = list('1.0  :')
-	
-	plotmat[2][67] = ':'
-	plotmat[6][67] = ':'
-	plotmat[10][67] = ':'
-	plotmat[14][67] = ':'
-	plotmat[18][67] = ':'
-	
+	labls = ['0.0  :', '0.25 :', '0.5  :', '0.75 :', '1.0  :']
+	for i in xrange(5):
+		plotmat[2 + i * (plotsize + 1)][0:6] = list(labls[i])
+		plotmat[2 + i * (plotsize + 1)][67] = ':'
 	
 	# print the result
 	print ""
