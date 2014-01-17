@@ -56,8 +56,13 @@ else:
 
 # download json file if file doesn't exist or if file is more 
 # than `downloadIfOlder` seconds old
-if (not(os.path.isfile(jsonfile)) or
-    (time.time() - os.path.getmtime(jsonfile) > downloadIfOlder)):
+downloadnew = False
+if not(os.path.isfile(jsonfile)):
+	downloadnew = True
+elif (time.time() - os.path.getmtime(jsonfile) > downloadIfOlder):
+	downloadnew = True
+    
+if downloadnew:
 	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
 	       + '/' + str(lat) + ',' + str(lon))
 	response = urllib2.urlopen(url)
