@@ -215,6 +215,42 @@ elif mode=="temp":
 		itic = xtixat[i] + 5
 		plotmat[0][itic:(itic + len(tic))] = tic
 
+#######################################################
+# 48 hours rain forecast
+#######################################################
+	
+elif mode=="rain2":
+	
+	rain = []
+	fcsttime = []
+	fcstday = []
+	for d in data["hourly"]["data"]:
+		pr = d["precipProbability"] 
+		rain.append(pr)
+		tim = d["time"] + time.timezone
+		tim = datetime.datetime.fromtimestamp(tim)
+		fcsttime.append(tim.strftime("%H:%M"))
+		fcstday.append(tim.strftime("%a"))
+
+	xtixat = []
+	xtix = []
+	for i,t in enumerate(fcsttime):
+		if t == "00:00":
+			xtixat.append(i)
+			xtix.append(fcstday[i])
+		if t == "12:00":
+			xtixat.append(i)
+			xtix.append(t)
+	
+	plotmat = txtplot(data=rain, ylim=[0,1], 
+	                  nyticks=5, yspacer=plotsize, 
+	                  xticksat=xtixat)
+
+	plotmat.insert(0, [" " for i in xrange(len(plotmat[0])+2)])
+	for i in xrange(len(xtixat)):
+		tic = list(xtix[i])
+		itic = xtixat[i] + 5
+		plotmat[0][itic:(itic + len(tic))] = tic
 else:
 	print "unknown mode: "+mode+" ... exiting"
 	sys.exit()
