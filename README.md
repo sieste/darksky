@@ -16,16 +16,27 @@
 forecastioApiKey: yOUr_foRecAST_dOt_Io_Api_Key
 lat: 50.7166
 lon: -3.5333
-rainheader: Probability of precipitation for Exeter, Devon, UK
 downloadIfOlder: 120
 jsonFile: /tmp/forecastio.json
+plotsize: 2
 ```
 
 
 
 ### Usage ###
 
-Currently, only the option `rain` is implemented. So the command 
+```
+./fcst.py mode
+```
+
+The following modes are currently implemented
+
+* **rain**: probability of precipitation over the next 60 minutes
+* **temp**: temperature forecast over the next 48 hours
+* **rain2**: probability of precipitation over the next 48 hours
+
+
+For example, the command
 
 ```
 ./fcst.py rain
@@ -35,32 +46,23 @@ will produce output similar to
 
 ```
 
-
-      Probability of precipitation for Exeter, Devon, UK
-
-      -------------------------------------------------------------
-1.0  :                                                             :
-     |                                                             |
-     |                                                             |
-     |                                                             |
-0.75 :         **                                                  :
-     |           *                                                 |
-     |        *   *                                                |
-     |                                                             |
-0.5  :       *     *                                               :
-     |                                                             |
-     |      *                                                      |
-     |              *                                              |
-0.25 :               *                                             :
-     |                                                       ******|
-     |     *          **                                *****      |
-     |    *             ********                   *****           |
-0.0  :****                      *******************                :
-      ---------------|--------------|--------------|---------------
-                    15             30             45              
-                             lead time [min]
-     t_0 = 09:37                                  (www.forecast.io)
-
+      ------------------------------------------------------------- 
+1.0  :                             *********                       :
+     |                           **         *                      |
+     |                          *            *                     |
+0.75 :                                        *                    :
+     |                        *                *                   |
+     |                      ** *                *                  |
+0.5  :                     *                     *****             :
+     |                                                *            |
+     |       **           *                            *           |
+0.25 :      *  *                                        *          :
+     |     *    *        *                               *****     |
+     | ****      *      *                                     *    |
+0.0  :*           ******                                       ****:
+      |--------------|--------------|--------------|--------------- 
+      01:08          +15min         +30min         +45min          
+                                              (src: www.forecast.io)
 
 ```
 
