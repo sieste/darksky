@@ -65,18 +65,20 @@ else:
 # txtplot function
 #######################################################
 
-def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[]):
+def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
 	n = len(data)
 	m = nyticks + (nyticks - 1) * yspacer 
 	plotmat = [[" " for i in xrange(n)] for i in xrange(m)]
 	ymin = min(ylim)
 	ymax = max(ylim)
+	if len(pch) != n:
+		pch = [pch[0] for i in xrange(n)]
 	# plot the data
 	for i in xrange(n):
 		j = (float(data[i]) - ymin) / (ymax - ymin) * (m - 1)
 		j = int(round(j))
 		if (j >= 0 and j < m):
-			plotmat[j][i] = "*"
+			plotmat[j][i] = pch[i]
 	# decorate the plot
 	# horizontal lines
 	plotmat.insert(0, ["-" for i in xrange(len(plotmat[0]))])
@@ -151,15 +153,24 @@ if mode == "rain":
 	precipProb = []
 	precipIntensity = []
 	fcsttime = []
+	pch = []
 	for d in data["minutely"]["data"]:
 		precipProb.append(d["precipProbability"])
-		precipIntensity.append(d["precipIntensity"])
+		pri = d["precipIntensity"]
+		if pri < 0.05:
+			pch.append(".")
+		elif pri >= 0.05 and pri < 0.1:
+			pch.append("o")
+		elif pri >= 0.1 and pri < 0.3:
+			pch.append("O")
+		else:
+			pch.append("#")
 		fcsttime.append(d["time"])
 
 	# plot
 	plotmat = txtplot(data=precipProb, ylim=[0,1], 
 	                  nyticks=5, yspacer=plotsize, 
-	                  xticksat=[0, 15, 30, 45])
+	                  xticksat=[0, 15, 30, 45], pch=pch)
 	
 	# add x axis labels
 	t0 = datetime.datetime.fromtimestamp(fcsttime[0] 
@@ -224,6 +235,7 @@ elif mode=="rain2":
 	rain = []
 	fcsttime = []
 	fcstday = []
+	pch = []
 	for d in data["hourly"]["data"]:
 		pr = d["precipProbability"] 
 		rain.append(pr)
@@ -231,6 +243,15 @@ elif mode=="rain2":
 		tim = datetime.datetime.fromtimestamp(tim)
 		fcsttime.append(tim.strftime("%H:%M"))
 		fcstday.append(tim.strftime("%a"))
+		pri = d["precipIntensity"]
+		if pri < 0.05:
+			pch.append(".")
+		elif pri >= 0.05 and pri < 0.1:
+			pch.append("o")
+		elif pri >= 0.1 and pri < 0.3:
+			pch.append("O")
+		else:
+			pch.append("#")
 
 	xtixat = []
 	xtix = []
@@ -244,7 +265,7 @@ elif mode=="rain2":
 	
 	plotmat = txtplot(data=rain, ylim=[0,1], 
 	                  nyticks=5, yspacer=plotsize, 
-	                  xticksat=xtixat)
+	                  xticksat=xtixat, pch=pch)
 
 	plotmat.insert(0, [" " for i in xrange(len(plotmat[0])+2)])
 	for i in xrange(len(xtixat)):
