@@ -34,10 +34,7 @@ The following modes are currently implemented
 * **rain**: probability of precipitation over the next 60 minutes
 * **rain2**: probability of precipitation over the next 48 hours
 * the markers indicate intensity of precipitation:
-    + `.` 0 - 1 mm/h
-    + `o` 1 - 2 mm/h
-    + `X` 2 - 5 mm/h
-    + `#`   > 5 mm/h
+    + `.` 0 - 1 mm/h `o` 1 - 2 mm/h `X` 2 - 5 mm/h `#` > 5 mm/h
 * **temp**: temperature forecast over the next 48 hours
 
 
