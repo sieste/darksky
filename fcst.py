@@ -156,13 +156,13 @@ if mode == "rain":
 	pch = []
 	for d in data["minutely"]["data"]:
 		precipProb.append(d["precipProbability"])
-		pri = d["precipIntensity"]
-		if pri < 0.05:
+		pri = d["precipIntensity"] * 25.4
+		if pri < 1:
 			pch.append(".")
-		elif pri >= 0.05 and pri < 0.1:
+		elif pri < 2:
 			pch.append("o")
-		elif pri >= 0.1 and pri < 0.3:
-			pch.append("O")
+		elif pri < 5:
+			pch.append("X")
 		else:
 			pch.append("#")
 		fcsttime.append(d["time"])
@@ -243,13 +243,13 @@ elif mode=="rain2":
 		tim = datetime.datetime.fromtimestamp(tim)
 		fcsttime.append(tim.strftime("%H:%M"))
 		fcstday.append(tim.strftime("%a"))
-		pri = d["precipIntensity"]
-		if pri < 0.05:
+		pri = d["precipIntensity"] * 25.4
+		if pri < 1:
 			pch.append(".")
-		elif pri >= 0.05 and pri < 0.1:
+		elif pri < 2:
 			pch.append("o")
-		elif pri >= 0.1 and pri < 0.3:
-			pch.append("O")
+		elif pri < 5:
+			pch.append("X")
 		else:
 			pch.append("#")
 
