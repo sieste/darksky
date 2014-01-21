@@ -194,7 +194,7 @@ elif mode=="temp":
 	fcsttime = []
 	fcstday = []
 	for d in data["hourly"]["data"]:
-		tmp = (d["temperature"] - 32) * 5 / 9
+		tmp = (d["temperature"] - 32.0) * 5.0 / 9.0
 		tmp = round(tmp, 1)
 		temp.append(tmp)
 		tim = d["time"] + time.timezone
@@ -225,6 +225,10 @@ elif mode=="temp":
 		tic = list(xtix[i])
 		itic = xtixat[i] + 5
 		plotmat[0][itic:(itic + len(tic))] = tic
+
+
+
+
 
 #######################################################
 # 48 hours rain forecast
@@ -272,6 +276,58 @@ elif mode=="rain2":
 		tic = list(xtix[i])
 		itic = xtixat[i] + 5
 		plotmat[0][itic:(itic + len(tic))] = tic
+
+
+
+
+
+#######################################################
+# print current conditions
+#######################################################
+
+elif mode == 'now':
+	d = data['currently']
+	if not 'summary' in d: d['summary'] = ''
+	if not 'temperature' in d: d['temperature'] = ''
+	else: d['temperature'] = str(round((d['temperature'] - 32.0) 
+	                             * 5.0 / 9.0, 1)) + ' C'
+	if not 'precipType' in d: d['precipType'] = ''
+	else: d['precipType'] = d['precipType'] + ', '
+	if not 'precipProbability' in d: d['precipProbability'] = ''
+	else: d['precipProbability'] = ('P = ' + 
+	      str(d['precipProbability']))
+	if not 'precipIntensity' in d: d['precipIntensity'] = ''
+	else: d['precipIntensity'] = (str(round(d['precipIntensity'] * 
+	                             25.4, 2)) + ' mm/h, ')
+	d['precip'] = (d['precipType'] + d['precipIntensity'] + 
+	              d['precipProbability'])
+	if not 'windSpeed' in d: d['windSpeed'] = ''
+	else: d['windSpeed'] = str(int(d['windSpeed'] * 1.6093)) + ' km/h'
+	if not 'windBearing' in d: d['windBearing'] = ''
+	else: d['windBearing'] = ['N','NE','E','SE','S','SW',
+	                          'W','NW'][int(d["windBearing"]
+	                         / 45.0)]
+	d['wind'] = d['windSpeed'] + ' ' + d['windBearing']
+	if not 'humidity' in d: d['humidity'] = ''
+	else: d['humidity'] = str(int(d['humidity'] * 100.0)) + ' %'
+	
+	out = [
+	('Summary:', d["summary"]),
+	('Temperature:', d["temperature"]),
+	('Precipitation:', d['precip']),
+	('Humidity:', d['humidity']),
+	('Wind: ', d['wind'])]
+	
+	tnow = datetime.datetime.fromtimestamp(time.time()).strftime('(%H:%M)')
+	print ""
+	print 'Current weather conditions ' + tnow
+	print ""
+	out2 = [[s.ljust(max(len(i) for i in column)) for s in column] for column in zip(*out)]
+	for p in ["  ".join(row) for row in zip(*out2)]: print p
+	print ""
+
+
+
 else:
 	print "unknown mode: "+mode+" ... exiting"
 	sys.exit()
@@ -285,12 +341,13 @@ else:
 # print plot matrix
 #######################################################
 
-print ""
-for i in reversed(xrange(len(plotmat))):
-	print ''.join(plotmat[i])
-idx = max(0, len(plotmat[1])-22)
-print ''.join([' ' for i in xrange(idx)]) + '(src: www.forecast.io)'
-print ""
+if ('plotmat' in locals()):
+	print ""
+	for i in reversed(xrange(len(plotmat))):
+		print ''.join(plotmat[i])
+	idx = max(0, len(plotmat[1])-22)
+	print ''.join([' ' for i in xrange(idx)]) + '(src: www.forecast.io)'
+	print ""
 
 
 
