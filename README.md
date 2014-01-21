@@ -39,6 +39,7 @@ The following modes are currently implemented
     + `X` 2 - 5 mm/h
     + `#`   > 5 mm/h
 * **temp**: temperature forecast over the next 48 hours
+* **now**: print current weather conditions
 
 
 For example, the command
