@@ -1,4 +1,4 @@
 .*.swp
 .*.conf
-.*.tmp
+*.tmp
 
