@@ -8,7 +8,7 @@
 
 ### Install and config ###
 
-* download the executable `fcst.py` 
+* clone the repository or download the executable `fcst.py` 
 * create the file `.pyfcio.conf` in your home directory with the following options (adjusted to your location):
 
 ```
