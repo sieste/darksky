@@ -287,45 +287,39 @@ elif mode=="rain2":
 
 elif mode == 'now':
 	d = data['currently']
-	if not 'summary' in d: d['summary'] = ''
-	if not 'temperature' in d: d['temperature'] = ''
-	else: d['temperature'] = str(round((d['temperature'] - 32.0) 
+	if not 'summary' in d: summary = ''
+	else: summary = d['summary']
+	if not 'temperature' in d: temperature = ''
+	else: temperature = str(round((d['temperature'] - 32.0) 
 	                             * 5.0 / 9.0, 1)) + ' C'
-	if not 'precipType' in d: d['precipType'] = ''
-	else: d['precipType'] = d['precipType'] + ', '
-	if not 'precipProbability' in d: d['precipProbability'] = ''
-	else: d['precipProbability'] = ('P = ' + 
-	      str(d['precipProbability']))
-	if not 'precipIntensity' in d: d['precipIntensity'] = ''
-	else: d['precipIntensity'] = (str(round(d['precipIntensity'] * 
-	                             25.4, 2)) + ' mm/h, ')
-	d['precip'] = (d['precipType'] + d['precipIntensity'] + 
-	              d['precipProbability'])
-	if not 'windSpeed' in d: d['windSpeed'] = ''
-	else: d['windSpeed'] = str(int(d['windSpeed'] * 1.6093)) + ' km/h'
-	if not 'windBearing' in d: d['windBearing'] = ''
-	else: d['windBearing'] = ['N','NE','E','SE','S','SW',
-	                          'W','NW'][int(d["windBearing"]
-	                         / 45.0)]
-	d['wind'] = d['windSpeed'] + ' ' + d['windBearing']
-	if not 'humidity' in d: d['humidity'] = ''
-	else: d['humidity'] = str(int(d['humidity'] * 100.0)) + ' %'
+	if not 'precipType' in d: d['precipType'] = 'rain'
+	if not 'precipIntensity' in d: d['precipIntensity'] = 0
+	if d['precipIntensity'] <= 0: precip = 'none'
+	else: precip = d['precipType'] + ' ' + str(round(d['precipIntensity'] * 25.4, 2)) + ' mm/h'
+	if not 'windSpeed' in d: windSpeed = '? km/h'
+	else: windSpeed = str(int(d['windSpeed'] * 1.6093)) + ' km/h '
+	if not 'windBearing' in d: windBearing = ''
+	else: 
+		windBearing = ['N','NE','E','SE','S','SW', 
+	                     'W', 'NW', 'N'][int(d["windBearing"] / 45.0)]
+	wind = windSpeed + windBearing
+	if not 'humidity' in d: humidity = ''
+	else: humidity = str(int(d['humidity'] * 100.0)) + ' %'
 	
 	out = [
-	('Summary:', d["summary"]),
-	('Temperature:', d["temperature"]),
-	('Precipitation:', d['precip']),
-	('Humidity:', d['humidity']),
-	('Wind: ', d['wind'])]
+	('Summary:', summary),
+	('Temperature:', temperature),
+	('Precipitation:', precip),
+	('Humidity:', humidity),
+	('Wind: ', wind)]
 	
-	tnow = datetime.datetime.fromtimestamp(time.time()).strftime('(%H:%M)')
+	tnow = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M')
 	print ""
-	print 'Current weather conditions ' + tnow
+	print 'Current weather conditions at ' + tnow
 	print ""
 	out2 = [[s.ljust(max(len(i) for i in column)) for s in column] for column in zip(*out)]
 	for p in ["  ".join(row) for row in zip(*out2)]: print p
 	print ""
-
 
 
 else:
@@ -341,7 +335,7 @@ else:
 # print plot matrix
 #######################################################
 
-if ('plotmat' in locals()):
+if not mode == "now":
 	print ""
 	for i in reversed(xrange(len(plotmat))):
 		print ''.join(plotmat[i])
