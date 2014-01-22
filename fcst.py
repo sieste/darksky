@@ -307,11 +307,11 @@ elif mode == 'now':
 	else: humidity = str(int(d['humidity'] * 100.0)) + ' %'
 	
 	out = [
-	('Summary:', summary),
-	('Temperature:', temperature),
-	('Precipitation:', precip),
-	('Humidity:', humidity),
-	('Wind: ', wind)]
+	('  Summary:', summary),
+	('  Temperature:', temperature),
+	('  Precipitation:', precip),
+	('  Humidity:', humidity),
+	('  Wind: ', wind)]
 	
 	tnow = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M')
 	print ""
