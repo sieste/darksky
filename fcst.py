@@ -292,6 +292,9 @@ elif mode == 'now':
 	if not 'temperature' in d: temperature = ''
 	else: temperature = str(round((d['temperature'] - 32.0) 
 	                             * 5.0 / 9.0, 1)) + ' C'
+	if 'apparentTemperature' in d: 
+		apptemp = round((d['apparentTemperature'] - 32.0) * 5.0 / 9.0, 1)
+		temperature = temperature + ' (feels like ' + str(apptemp) + ' C)'
 	if not 'precipType' in d: d['precipType'] = 'rain'
 	if not 'precipIntensity' in d: d['precipIntensity'] = 0
 	if d['precipIntensity'] <= 0: precip = 'none'
