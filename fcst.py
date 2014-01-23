@@ -299,13 +299,17 @@ elif mode == 'now':
 	if not 'precipIntensity' in d: d['precipIntensity'] = 0
 	if d['precipIntensity'] <= 0: precip = 'none'
 	else: precip = d['precipType'] + ' ' + str(round(d['precipIntensity'] * 25.4, 2)) + ' mm/h'
-	if not 'windSpeed' in d: windSpeed = '? km/h'
-	else: windSpeed = str(int(d['windSpeed'] * 1.6093)) + ' km/h '
+	if not 'windSpeed' in d: 
+		windSpeed = '? km/h '
+		bft = ''
+	else: 
+		windSpeed = str(int(d['windSpeed'] * 1.6093)) + ' km/h '
+		bft = '('+str(int((d['windSpeed'] * 1.6093 / 3.0) ** (2.0/3.0))) + ' Bft)'
 	if not 'windBearing' in d: windBearing = ''
 	else: 
 		windBearing = ['N','NE','E','SE','S','SW', 
-	                     'W', 'NW', 'N'][int(d["windBearing"] / 45.0)]
-	wind = windSpeed + windBearing
+	                     'W', 'NW', 'N'][int(d["windBearing"] / 45.0)] + ' '
+	wind = windSpeed + windBearing + bft
 	if not 'humidity' in d: humidity = ''
 	else: humidity = str(int(d['humidity'] * 100.0)) + ' %'
 	
