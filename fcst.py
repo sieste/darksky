@@ -24,17 +24,20 @@ else:
 
 conffile = os.path.expanduser("~/.pyfcio.conf")
 config = ConfigParser.ConfigParser()
+
 if os.path.isfile(conffile):
 	config.read(conffile)
 else:
 	print "No config file " + conffile + " found. Please create one first ... exiting" 
 	sys.exit()
+
 # forecast.io api key
 if config.has_option("Settings", "forecastioApiKey"):
 	forecastioApiKey = config.get("Settings", "forecastioApiKey")
 else:
 	print "Please provide variable `forecastioApiKey` under section [Settings] in file " + conffile + " ... exiting"
 	sys.exit()
+
 # latitude and longitude
 if (config.has_option("Settings", "lat") & 
     config.has_option("Settings", "lon")):
@@ -43,16 +46,19 @@ if (config.has_option("Settings", "lat") &
 else:
 	print "Please provide variables `lat` and `lon` under section [Settings] in file " + conffile + " ... exiting"
 	sys.exit()
+
 # downloadIfOlder option
 if (config.has_option("Settings", "downloadIfOlder")):
 	downloadIfOlder = float(config.get("Settings", "downloadIfOlder"))
 else:
 	downloadIfOlder = 120
+
 # plot height
 if (config.has_option("Settings", "plotsize")):
 	plotsize = int(config.get("Settings", "plotsize"))
 else:
 	plotsize = 2
+
 # json filename
 if (config.has_option("Settings", "jsonFile")):
 	jsonfilename = config.get("Settings", "jsonFile")
@@ -66,6 +72,18 @@ else:
 #######################################################
 
 def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
+	""" 
+	Create the ascii plot on the console.
+
+	Input parameters:
+	-----------------
+	data		-list of x-values to be printed
+	ylim		-lower and upper limit of printed data
+	nyticks		-number of ticks in y axis
+	nxticks		-number of ticks in x axsis
+	xticksat	-list of location for the ticks
+	pch		-list of symbols to be shown (for intensity)
+	"""
 	n = len(data)
 	m = nyticks + (nyticks - 1) * yspacer 
 	plotmat = [[" " for i in xrange(n)] for i in xrange(m)]
@@ -116,28 +134,26 @@ def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
 	return plotmat
 
 
-
-
 #######################################################
 # download and open json file 
 #######################################################
 
 # if file doesn't exist or if file is more 
 # than `downloadIfOlder` seconds old
-downloadnew = False
-if not(os.path.isfile(jsonfilename)):
-	downloadnew = True
-elif (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder):
-	downloadnew = True
-if downloadnew:
+if not (os.path.isfile(jsonfilename)) or  (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder):
 	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
 	       + '/' + str(lat) + ',' + str(lon))
 	response = urllib2.urlopen(url)
 	fcstData = response.read()
+	
+	data = json.loads(fcstData)  # converts to the required format
+
 	with open(jsonfilename, 'wb') as jsonFile:
 		jsonFile.write(fcstData)
-with open(jsonfilename, 'r') as jsonFile:
-	data = json.load(jsonFile)
+else:
+	# load the data from the file
+	with open(jsonfilename, 'r') as jsonFile:
+		data = json.load(jsonFile)
 
 
 
