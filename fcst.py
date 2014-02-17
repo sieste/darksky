@@ -5,14 +5,62 @@ import json
 import time
 import datetime
 import ConfigParser
+import argparse 
 import sys
 import os
 import math
 
-if len(sys.argv) < 2:
-	mode = "rain"
-else:
-	mode = sys.argv[1]
+
+
+
+
+
+#######################################################
+# get options from command line
+#######################################################
+
+## set up default variables
+
+def_mode = ["rain"]
+def_file = ["~/.pyfcio.conf"]
+
+
+
+
+# initialize the parser
+parser = argparse.ArgumentParser(#usage="%(prog)s [options]",
+                                 description="Command line forcast.")
+
+# forecast mode
+parser.add_argument("mode",type=str, nargs=1, default=def_mode,
+                    help="forecast mode [rain | rain2 | now]")
+
+# config file
+parser.add_argument("-f","--file", nargs=1,type=str,default = def_file,
+                    help="config file")
+
+# user ID
+parser.add_argument("-k","--key", nargs=1, type=str,
+		    help="user key to the forecastio database")
+
+# output verbosity
+parser.add_argument("-v","--verbose",action="store_true",
+                    help="verbose output")
+
+
+
+
+args = parser.parse_args()
+
+if args.verbose:
+	print "The following arguments were parsed from the command line"
+	print "---------------------------------------------------------"
+	print "Config file:\t", args.file[0]
+	print "Forecast mode:\t" , args.mode[0]
+	print "User key:\t", args.key
+	print
+
+mode = args.mode[0]
 
 
 
@@ -22,20 +70,27 @@ else:
 # get options from config file
 #######################################################
 
-conffile = os.path.expanduser("~/.pyfcio.conf")
-config = ConfigParser.ConfigParser()
 
+conffile = os.path.expanduser(args.file[0])
+config = ConfigParser.ConfigParser()
 if os.path.isfile(conffile):
-	config.read(conffile)
+	try:
+		config.read(conffile)
+	except:
+		print "Error reading configuration file. Please check the formating of "+ conffile + "."
+		sys.exit()
 else:
 	print "No config file " + conffile + " found. Please create one first ... exiting" 
 	sys.exit()
 
+
 # forecast.io api key
-if config.has_option("Settings", "forecastioApiKey"):
+if args.key:
+	forecastioApiKey = args.key[0]
+elif config.has_option("Settings", "forecastioApiKey"):
 	forecastioApiKey = config.get("Settings", "forecastioApiKey")
 else:
-	print "Please provide variable `forecastioApiKey` under section [Settings] in file " + conffile + " ... exiting"
+	print "Please provide variable `forecastioApiKey` under section [Settings] in file " + conffile + "or specify the --key command line option."
 	sys.exit()
 
 # latitude and longitude
@@ -72,18 +127,6 @@ else:
 #######################################################
 
 def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
-	""" 
-	Create the ascii plot on the console.
-
-	Input parameters:
-	-----------------
-	data		-list of x-values to be printed
-	ylim		-lower and upper limit of printed data
-	nyticks		-number of ticks in y axis
-	nxticks		-number of ticks in x axsis
-	xticksat	-list of location for the ticks
-	pch		-list of symbols to be shown (for intensity)
-	"""
 	n = len(data)
 	m = nyticks + (nyticks - 1) * yspacer 
 	plotmat = [[" " for i in xrange(n)] for i in xrange(m)]
@@ -134,26 +177,28 @@ def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
 	return plotmat
 
 
+
+
 #######################################################
 # download and open json file 
 #######################################################
 
 # if file doesn't exist or if file is more 
 # than `downloadIfOlder` seconds old
-if not (os.path.isfile(jsonfilename)) or  (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder):
+downloadnew = False
+if not(os.path.isfile(jsonfilename)):
+	downloadnew = True
+elif (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder):
+	downloadnew = True
+if downloadnew:
 	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
 	       + '/' + str(lat) + ',' + str(lon))
 	response = urllib2.urlopen(url)
 	fcstData = response.read()
-	
-	data = json.loads(fcstData)  # converts to the required format
-
 	with open(jsonfilename, 'wb') as jsonFile:
 		jsonFile.write(fcstData)
-else:
-	# load the data from the file
-	with open(jsonfilename, 'r') as jsonFile:
-		data = json.load(jsonFile)
+with open(jsonfilename, 'r') as jsonFile:
+	data = json.load(jsonFile)
 
 
 
