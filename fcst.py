@@ -19,48 +19,63 @@ import math
 # get options from command line
 #######################################################
 
-## set up default variables
-
-def_mode = ["rain"]
-def_file = ["~/.pyfcio.conf"]
-
-
-
+# the config file has to be created. The options specified
+# in the config file are overwriten by the comman line options.
 
 # initialize the parser
 parser = argparse.ArgumentParser(#usage="%(prog)s [options]",
                                  description="Command line forcast.")
 
 # forecast mode
-parser.add_argument("mode",type=str, nargs=1, default=def_mode,
+parser.add_argument("mode",type=str, 
+		    nargs="?", 
+		    default="rain",
                     help="forecast mode [rain | rain2 | now]")
 
 # config file
-parser.add_argument("-f","--file", nargs=1,type=str,default = def_file,
+parser.add_argument("-f",
+		    "--file", 
+		    nargs="?",
+		    type=str,
+		    default = "~/.pyfcio.conf",
                     help="config file")
 
-# user ID
-parser.add_argument("-k","--key", nargs=1, type=str,
+# forcastio Api Key
+parser.add_argument("-k",
+		    "--key", 
+		    nargs="?", 
+		    type=str,
 		    help="user key to the forecastio database")
 
+# force new download of the data file
+parser.add_argument("-d",
+		    "--download", 
+		    action = "store_true",
+		    help="force new download of the data file")
+
+
 # output verbosity
-parser.add_argument("-v","--verbose",action="store_true",
+parser.add_argument("-v",
+		    "--verbose",
+		    action="store_true",
                     help="verbose output")
 
-
-
-
+# parse arguments into args variable.
 args = parser.parse_args()
 
+
+# show what has been parsed
 if args.verbose:
+	print "Verbose mode"
+	print "---------------------------------------------------------"
 	print "The following arguments were parsed from the command line"
 	print "---------------------------------------------------------"
-	print "Config file:\t", args.file[0]
-	print "Forecast mode:\t" , args.mode[0]
+	print "Config file:\t", args.file
+	print "Forecast mode:\t" , args.mode
 	print "User key:\t", args.key
-	print
+	print 
 
-mode = args.mode[0]
+
 
 
 
@@ -71,7 +86,7 @@ mode = args.mode[0]
 #######################################################
 
 
-conffile = os.path.expanduser(args.file[0])
+conffile = os.path.expanduser(args.file)
 config = ConfigParser.ConfigParser()
 
 # Read config file
@@ -79,7 +94,7 @@ if os.path.isfile(conffile):
 	try:
 		config.read(conffile)
 	except:
-		print "Error reading configuration file. Please check the formating of "+ conffile + "."
+		print "Error reading config file " + conffile + "... exiting"
 		sys.exit()
 else:
 	print "No config file " + conffile + " found. Please create one first ... exiting" 
@@ -88,7 +103,7 @@ else:
 
 # forecast.io api key
 if args.key:
-	forecastioApiKey = args.key[0]
+	forecastioApiKey = args.key
 elif config.has_option("Settings", "forecastioApiKey"):
 	forecastioApiKey = config.get("Settings", "forecastioApiKey")
 else:
@@ -124,11 +139,29 @@ else:
 
 
 
+
+
+
+
 #######################################################
 # txtplot function
 #######################################################
 
 def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], xmticksat=[], pch="*"):
+	""" 
+	Create the ascii plot on the console.
+
+	Input parameters:
+	-----------------
+	data		- list of x-values to be printed
+	ylim		- lower and upper limit of printed data
+	nyticks		- number of ticks in y axis
+	nxticks		- number of ticks in x axsis
+	xticksat	- list of location for the ticks
+	xmticksat	- list of location for the minor ticks
+	pch		- list of symbols to be shown (for intensity)
+	"""
+	
 	n = len(data)
 	m = nyticks + (nyticks - 1) * yspacer 
 	plotmat = [[" " for i in xrange(n)] for i in xrange(m)]
@@ -193,26 +226,35 @@ def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], xmticksat=[], pch="*"
 
 
 
+
+
+
 #######################################################
 # download and open json file 
 #######################################################
 
-# if file doesn't exist or if file is more 
-# than `downloadIfOlder` seconds old
-downloadnew = False
-if not(os.path.isfile(jsonfilename)):
-	downloadnew = True
-elif (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder):
-	downloadnew = True
-if downloadnew:
-	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
-	       + '/' + str(lat) + ',' + str(lon))
-	response = urllib2.urlopen(url)
-	fcstData = response.read()
-	with open(jsonfilename, 'wb') as jsonFile:
-		jsonFile.write(fcstData)
-with open(jsonfilename, 'r') as jsonFile:
-	data = json.load(jsonFile)
+# if file doesn't exist or it's more than `downloadIfOlder` 
+# seconds old or if the download ir forced by command line option -d
+if not (os.path.isfile(jsonfilename)) \
+    or  (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder) \
+    or args.download:
+
+	if args.verbose:
+		print "Downloading the data."
+
+ 	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
+ 	       + '/' + str(lat) + ',' + str(lon))
+ 	response = urllib2.urlopen(url)
+ 	fcstData = response.read()
+	
+	data = json.loads(fcstData)  # converts to the required format
+
+ 	with open(jsonfilename, 'wb') as jsonFile:
+ 		jsonFile.write(fcstData)
+else:
+	# load the data from the file
+	with open(jsonfilename, 'r') as jsonFile:
+		data = json.load(jsonFile)
 
 
 
@@ -223,7 +265,7 @@ with open(jsonfilename, 'r') as jsonFile:
 # 60 minutes precipitation forecast
 #######################################################
 
-if mode == "rain":
+if args.mode == "rain":
 	# get precip data from json file
 	precipProb = []
 	precipIntensity = []
@@ -243,9 +285,12 @@ if mode == "rain":
 		fcsttime.append(d["time"])
 
 	# plot
-	plotmat = txtplot(data=precipProb, ylim=[0,1], 
-	                  nyticks=5, yspacer=plotsize, 
-	                  xticksat=[0, 15, 30, 45], pch=pch)
+	plotmat = txtplot(data=precipProb, 
+			  ylim=[0,1], 
+	                  nyticks=5, 
+			  yspacer=plotsize, 
+	                  xticksat=[0, 15, 30, 45], 
+			  pch=pch)
 	
 	# add x axis labels
 	t0 = datetime.datetime.fromtimestamp(fcsttime[0] 
@@ -263,7 +308,7 @@ if mode == "rain":
 # 48 hours temperature forecast
 #######################################################
 	
-elif mode=="temp":
+elif args.mode=="temp":
 	
 	temp = []
 	fcsttime = []
@@ -311,7 +356,7 @@ elif mode=="temp":
 # 48 hours rain forecast
 #######################################################
 	
-elif mode=="rain2":
+elif args.mode=="rain2":
 	
 	rain = []
 	fcsttime = []
@@ -334,6 +379,7 @@ elif mode=="rain2":
 		else:
 			pch.append("#")
 
+	# creates ticks at the specified positions -- 
 	xtixat = []
 	xmtixat = [] # minor ticks array
 	xtix = []
@@ -369,7 +415,7 @@ elif mode=="rain2":
 # print current conditions
 #######################################################
 
-elif mode == 'now':
+elif args.mode == 'now':
 	d = data['currently']
 	if not 'summary' in d: summary = ''
 	else: summary = d['summary']
@@ -414,7 +460,7 @@ elif mode == 'now':
 
 
 else:
-	print "unknown mode: "+mode+" "
+	print "unknown mode: "+args.mode+" "
 	sys.exit()
 	
 
@@ -426,7 +472,7 @@ else:
 # print plot matrix
 #######################################################
 
-if not mode == "now":
+if not args.mode == "now":
 	print ""
 	for i in reversed(xrange(len(plotmat))):
 		print ''.join(plotmat[i])
