@@ -73,6 +73,8 @@ mode = args.mode[0]
 
 conffile = os.path.expanduser(args.file[0])
 config = ConfigParser.ConfigParser()
+
+# Read config file
 if os.path.isfile(conffile):
 	try:
 		config.read(conffile)
@@ -126,7 +128,7 @@ else:
 # txtplot function
 #######################################################
 
-def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
+def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], xmticksat=[], pch="*"):
 	n = len(data)
 	m = nyticks + (nyticks - 1) * yspacer 
 	plotmat = [[" " for i in xrange(n)] for i in xrange(m)]
@@ -134,20 +136,31 @@ def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
 	ymax = max(ylim)
 	if len(pch) != n:
 		pch = [pch[0] for i in xrange(n)]
+
 	# plot the data
 	for i in xrange(n):
 		j = (float(data[i]) - ymin) / (ymax - ymin) * (m - 1)
 		j = int(round(j))
 		if (j >= 0 and j < m):
 			plotmat[j][i] = pch[i]
+
+
 	# decorate the plot
 	# horizontal lines
 	plotmat.insert(0, ["-" for i in xrange(len(plotmat[0]))])
 	plotmat.append(["-" for i in xrange(len(plotmat[0]))])
+
 	# x ticks
 	for i in xticksat:
 		if i >=0 and i < len(plotmat[0]):
 			plotmat[0][i] = "|"
+	
+	# x minor ticks
+	for i in xmticksat:
+		if i >=0 and i < len(plotmat[0]):
+			plotmat[0][i] = "+"
+
+
 	# vertical lines with ticks
 	vline = ["|" for i in xrange(m)]
 	yticksat = [i for i in xrange(0, m, yspacer+1)]
@@ -158,6 +171,7 @@ def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
 	for i in xrange(len(vline)):
 		plotmat[i].insert(0, vline[i])
 		plotmat[i].append(vline[i])
+
 	# y tick labels
 	dy = float((ymax - ymin)) / (nyticks - 1)
 	ytickvals = [float(ymin + i * dy) for i in xrange(nyticks)]
@@ -173,7 +187,7 @@ def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], pch="*"):
 	for i in xrange(len(yticksat)):
 		itick = yticksat[i] + 1
 		plotmat[itick][0:len(yticklabels[i])] = yticklabels[i]
-	# return 
+
 	return plotmat
 
 
@@ -277,8 +291,10 @@ elif mode=="temp":
 			xtixat.append(i)
 			xtix.append(t)
 	
-	plotmat = txtplot(data=temp, ylim=[ymin,ymax], 
-	                  nyticks=nytix, yspacer=plotsize, 
+	plotmat = txtplot(data=temp, 
+			  ylim=[ymin,ymax], 
+	                  nyticks=nytix, 
+			  yspacer=plotsize, 
 	                  xticksat=xtixat)
 
 	plotmat.insert(0, [" " for i in xrange(len(plotmat[0])+2)])
@@ -319,6 +335,7 @@ elif mode=="rain2":
 			pch.append("#")
 
 	xtixat = []
+	xmtixat = [] # minor ticks array
 	xtix = []
 	for i,t in enumerate(fcsttime):
 		if t == "00:00":
@@ -327,10 +344,16 @@ elif mode=="rain2":
 		if t == "12:00":
 			xtixat.append(i)
 			xtix.append(t)
+		if t == "06:00" or t == "18:00":
+			xmtixat.append(i)
 	
-	plotmat = txtplot(data=rain, ylim=[0,1], 
-	                  nyticks=5, yspacer=plotsize, 
-	                  xticksat=xtixat, pch=pch)
+	plotmat = txtplot(data=rain, 
+			  ylim=[0,1], 
+	                  nyticks=5, 
+			  yspacer=plotsize, 
+	                  xticksat=xtixat, 
+			  xmticksat = xmtixat,
+			  pch=pch)
 
 	plotmat.insert(0, [" " for i in xrange(len(plotmat[0])+2)])
 	for i in xrange(len(xtixat)):
@@ -391,7 +414,7 @@ elif mode == 'now':
 
 
 else:
-	print "unknown mode: "+mode+" ... exiting"
+	print "unknown mode: "+mode+" "
 	sys.exit()
 	
 
