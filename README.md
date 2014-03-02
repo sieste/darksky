@@ -14,11 +14,24 @@
 ```
 [Settings]
 forecastioApiKey: yOUr_foRecAST_dOt_Io_Api_Key
+jsonFile: /tmp/forecastio%s.json
+
+# kept for backwards compatibility
+rainheader: Probability of precipitation for Exeter, Devon, UK
+lat: 50.7166 
+lon: -3.5333
+
+[Exeter]
 lat: 50.7166
 lon: -3.5333
-downloadIfOlder: 120
-jsonFile: /tmp/forecastio.json
-plotsize: 2
+
+[Dresden]
+lat: 51.051754
+lon: 13.728561
+
+[Bilovec]
+lat: 49.756429
+lon: 18.015404
 ```
 
 

@@ -11,7 +11,10 @@ import os
 import math
 
 
-
+def celsius(F):
+	"""Converts the temperature in Farenheit in Celsius"""
+	return (F - 32.0) * 5.0 / 9.0
+	
 
 
 
@@ -47,6 +50,14 @@ parser.add_argument("-k",
 		    type=str,
 		    help="user key to the forecastio database")
 
+# location key
+parser.add_argument("-l",
+		    "--location", 
+		    nargs="?", 
+		    type=str,
+		    default = "Settings",
+		    help="location defined in the config file")
+
 # force new download of the data file
 parser.add_argument("-d",
 		    "--download", 
@@ -73,7 +84,8 @@ if args.verbose:
 	print "Config file:\t", args.file
 	print "Forecast mode:\t" , args.mode
 	print "User key:\t", args.key
-	print 
+	print "Location:\t", args.loction
+	print
 
 
 
@@ -101,29 +113,36 @@ else:
 	sys.exit()
 
 
+
 # forecast.io api key
 if args.key:
 	forecastioApiKey = args.key
 elif config.has_option("Settings", "forecastioApiKey"):
 	forecastioApiKey = config.get("Settings", "forecastioApiKey")
 else:
-	print "Please provide variable `forecastioApiKey` under section [Settings] in file " + conffile + "or specify the --key command line option."
+	print "Please provide variable `forecastioApiKey` under section [Settings] in file "\
+	    + conffile + "or specify the --key command line option."
 	sys.exit()
+
 
 # latitude and longitude
-if (config.has_option("Settings", "lat") & 
-    config.has_option("Settings", "lon")):
-	lat = config.get("Settings", "lat")
-	lon = config.get("Settings", "lon")
+if (config.has_option(args.location, "lat") & 
+    config.has_option(args.location, "lon")):
+	lat = config.get(args.location, "lat")
+	lon = config.get(args.location, "lon")
 else:
-	print "Please provide variables `lat` and `lon` under section [Settings] in file " + conffile + " ... exiting"
+	print "Please provide location variables `lat` and `lon` under section [" + args.location + \
+	    "] in file " + conffile + " ... exiting"
 	sys.exit()
 
+
 # downloadIfOlder option
+# maybe it would be enough to have hard coded 120s and the forced download command line option
 if (config.has_option("Settings", "downloadIfOlder")):
 	downloadIfOlder = float(config.get("Settings", "downloadIfOlder"))
 else:
 	downloadIfOlder = 120
+
 
 # plot height
 if (config.has_option("Settings", "plotsize")):
@@ -131,11 +150,17 @@ if (config.has_option("Settings", "plotsize")):
 else:
 	plotsize = 2
 
+
 # json filename
 if (config.has_option("Settings", "jsonFile")):
-	jsonfilename = config.get("Settings", "jsonFile")
+	# the jsonFile has to contain %s in the string
+	try:
+		jsonfilename = config.get("Settings", "jsonFile") % args.location
+	except TypeError:
+		print "Please include '%s' in in the option jsonFile in the [Settings] section in the config file: " + args.file
+		
 else:
-	jsonfilename = "/tmp/forecastio.json"
+	jsonfilename = "/tmp/forecastio"+ args.location +".json"
 
 
 
@@ -266,12 +291,19 @@ else:
 #######################################################
 
 if args.mode == "rain":
+	try:
+		mData = data["minutely"]["data"]
+	except KeyError:
+		print "The data for minutely precision are not available for this location ("\
+		    + args.location + ")."
+		sys.exit()
+
 	# get precip data from json file
 	precipProb = []
 	precipIntensity = []
 	fcsttime = []
 	pch = []
-	for d in data["minutely"]["data"]:
+	for d in mData:
 		precipProb.append(d["precipProbability"])
 		pri = d["precipIntensity"] * 25.4
 		if pri < 1:
@@ -309,12 +341,20 @@ if args.mode == "rain":
 #######################################################
 	
 elif args.mode=="temp":
+	try:
+		hData = data["hourly"]["data"]
+	except KeyError:
+		print "The data for hourly precision are not available for this location ("\
+		    + args.location + ")."
+		sys.exit()
+
 	
 	temp = []
 	fcsttime = []
 	fcstday = []
-	for d in data["hourly"]["data"]:
-		tmp = (d["temperature"] - 32.0) * 5.0 / 9.0
+
+	for d in hData:
+		tmp = celsius(d["temperature"])
 		tmp = round(tmp, 1)
 		temp.append(tmp)
 		tim = d["time"] + time.timezone
@@ -357,14 +397,19 @@ elif args.mode=="temp":
 #######################################################
 	
 elif args.mode=="rain2":
-	
+	try:
+		hData = data["hourly"]["data"]
+	except KeyError:
+		print "The data for hourly precision are not available for this location ("\
+		    + args.location + ")."
+		sys.exit()
+
 	rain = []
 	fcsttime = []
 	fcstday = []
 	pch = []
-	for d in data["hourly"]["data"]:
-		pr = d["precipProbability"] 
-		rain.append(pr)
+	for d in hData:
+		rain.append(d["precipProbability"] )
 		tim = d["time"] + time.timezone
 		tim = datetime.datetime.fromtimestamp(tim)
 		fcsttime.append(tim.strftime("%H:%M"))
@@ -416,40 +461,80 @@ elif args.mode=="rain2":
 #######################################################
 
 elif args.mode == 'now':
-	d = data['currently']
-	if not 'summary' in d: summary = ''
-	else: summary = d['summary']
-	if not 'temperature' in d: temperature = ''
-	else: temperature = str(round((d['temperature'] - 32.0) 
-	                             * 5.0 / 9.0, 1)) + ' C'
+	# obtain the current condition from the data file
+	try:
+		d = data['currently']
+	except KeyError:
+		print "The data for current conditions are not available for this location ("\
+		    + args.location + ")."
+		sys.exit()
+
+
+	if not 'summary' in d: 
+		summary = ''
+	else: 
+		summary = d['summary']
+
+
+	if not 'temperature' in d: 
+		temperature = ''
+	else: 
+		temperature = str(round(celsius(d['temperature']))) + ' C'
+
+
 	if 'apparentTemperature' in d: 
-		apptemp = round((d['apparentTemperature'] - 32.0) * 5.0 / 9.0, 1)
+		apptemp = round(celsius(d['apparentTemperature']), 1)
 		temperature = temperature + ' (feels like ' + str(apptemp) + ' C)'
-	if not 'precipType' in d: d['precipType'] = 'rain'
-	if not 'precipIntensity' in d: d['precipIntensity'] = 0
-	if d['precipIntensity'] <= 0: precip = 'none'
-	else: precip = d['precipType'] + ' ' + str(round(d['precipIntensity'] * 25.4, 2)) + ' mm/h'
+
+
+	if not 'precipType' in d: 
+		d['precipType'] = 'rain'
+
+
+	if not 'precipIntensity' in d: 
+		d['precipIntensity'] = 0
+
+
+	if d['precipIntensity'] <= 0: 
+		precip = 'none'
+	else: 
+		precip = d['precipType'] + ' ' + str(round(d['precipIntensity'] * 25.4, 2)) + ' mm/h'
+
+	
+
+
+	# WIND
 	if not 'windSpeed' in d: 
 		windSpeed = '? km/h '
 		bft = ''
 	else: 
 		windSpeed = str(int(d['windSpeed'] * 1.6093)) + ' km/h '
 		bft = '('+str(int((d['windSpeed'] * 1.6093 / 3.0) ** (2.0/3.0))) + ' Bft)'
-	if not 'windBearing' in d: windBearing = ''
+
+
+	if not 'windBearing' in d: 
+		windBearing = ''
 	else: 
 		windBearing = ['N','NE','E','SE','S','SW', 
 	                     'W', 'NW', 'N'][int(d["windBearing"] / 45.0)] + ' '
 	wind = windSpeed + windBearing + bft
-	if not 'humidity' in d: humidity = ''
-	else: humidity = str(int(d['humidity'] * 100.0)) + ' %'
+
+
+
+	if not 'humidity' in d: 
+		humidity = ''
+	else: 
+		humidity = str(int(d['humidity'] * 100.0)) + ' %'
+
 	
 	out = [
-	('  Summary:', summary),
-	('  Temperature:', temperature),
-	('  Precipitation:', precip),
-	('  Humidity:', humidity),
-	('  Wind: ', wind)]
+		('  Summary:', summary),
+		('  Temperature:', temperature),
+		('  Precipitation:', precip),
+		('  Humidity:', humidity),
+		('  Wind: ', wind)]
 	
+
 	tnow = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M')
 	print ""
 	print 'Current weather conditions at ' + tnow
