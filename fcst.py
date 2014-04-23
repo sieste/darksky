@@ -107,10 +107,10 @@ if os.path.isfile(conffile):
 		config.read(conffile)
 	except:
 		print "Error reading config file " + conffile + "... exiting"
-		sys.exit()
+		sys.exit(1)
 else:
 	print "No config file " + conffile + " found. Please create one first ... exiting" 
-	sys.exit()
+	sys.exit(1)
 
 
 
@@ -122,7 +122,7 @@ elif config.has_option("Settings", "forecastioApiKey"):
 else:
 	print "Please provide variable `forecastioApiKey` under section [Settings] in file "\
 	    + conffile + "or specify the --key command line option."
-	sys.exit()
+	sys.exit(1)
 
 
 # latitude and longitude
@@ -133,7 +133,7 @@ if (config.has_option(args.location, "lat") &
 else:
 	print "Please provide location variables `lat` and `lon` under section [" + args.location + \
 	    "] in file " + conffile + " ... exiting"
-	sys.exit()
+	sys.exit(1)
 
 
 # downloadIfOlder option
@@ -269,7 +269,11 @@ if not (os.path.isfile(jsonfilename)) \
 
  	url = ('https://api.forecast.io/forecast/' + forecastioApiKey
  	       + '/' + str(lat) + ',' + str(lon))
- 	response = urllib2.urlopen(url)
+	try:
+ 		response = urllib2.urlopen(url)
+	except:
+		print "Connection failed."
+		sys.exit(1)
  	fcstData = response.read()
 	
 	data = json.loads(fcstData)  # converts to the required format
@@ -296,7 +300,7 @@ if args.mode == "rain":
 	except KeyError:
 		print "The data for minutely precision are not available for this location ("\
 		    + args.location + ")."
-		sys.exit()
+		sys.exit(1)
 
 	# get precip data from json file
 	precipProb = []
@@ -346,7 +350,7 @@ elif args.mode=="temp":
 	except KeyError:
 		print "The data for hourly precision are not available for this location ("\
 		    + args.location + ")."
-		sys.exit()
+		sys.exit(1)
 
 	
 	temp = []
@@ -402,7 +406,7 @@ elif args.mode=="rain2":
 	except KeyError:
 		print "The data for hourly precision are not available for this location ("\
 		    + args.location + ")."
-		sys.exit()
+		sys.exit(1)
 
 	rain = []
 	fcsttime = []
@@ -467,7 +471,7 @@ elif args.mode == 'now':
 	except KeyError:
 		print "The data for current conditions are not available for this location ("\
 		    + args.location + ")."
-		sys.exit()
+		sys.exit(1)
 
 
 	if not 'summary' in d: 
@@ -546,7 +550,7 @@ elif args.mode == 'now':
 
 else:
 	print "unknown mode: "+args.mode+" "
-	sys.exit()
+	sys.exit(1)
 	
 
 
