@@ -11,160 +11,14 @@ import os
 import math
 
 
+##################################################
+# Conversion of the units
+##################################################
+
 def celsius(F):
-	"""Converts the temperature in Farenheit in Celsius"""
+	"""Converts the temperature in Farenheit to Celsius"""
 	return (F - 32.0) * 5.0 / 9.0
 	
-
-
-
-#######################################################
-# get options from command line
-#######################################################
-
-# the config file has to be created. The options specified
-# in the config file are overwriten by the comman line options.
-
-# initialize the parser
-parser = argparse.ArgumentParser(#usage="%(prog)s [options]",
-                                 description="Command line forcast.")
-
-# forecast mode
-parser.add_argument("mode",type=str, 
-		    nargs="?", 
-		    default="rain",
-                    help="forecast mode [rain | rain2 | now]")
-
-# config file
-parser.add_argument("-f",
-		    "--file", 
-		    nargs="?",
-		    type=str,
-		    default = "~/.pyfcio.conf",
-                    help="config file")
-
-# forcastio Api Key
-parser.add_argument("-k",
-		    "--key", 
-		    nargs="?", 
-		    type=str,
-		    help="user key to the forecastio database")
-
-# location key
-parser.add_argument("-l",
-		    "--location", 
-		    nargs="?", 
-		    type=str,
-		    default = "Settings",
-		    help="location defined in the config file")
-
-# force new download of the data file
-parser.add_argument("-d",
-		    "--download", 
-		    action = "store_true",
-		    help="force new download of the data file")
-
-
-# output verbosity
-parser.add_argument("-v",
-		    "--verbose",
-		    action="store_true",
-                    help="verbose output")
-
-# parse arguments into args variable.
-args = parser.parse_args()
-
-
-# show what has been parsed
-if args.verbose:
-	print "Verbose mode"
-	print "---------------------------------------------------------"
-	print "The following arguments were parsed from the command line"
-	print "---------------------------------------------------------"
-	print "Config file:\t", args.file
-	print "Forecast mode:\t" , args.mode
-	print "User key:\t", args.key
-	print "Location:\t", args.loction
-	print
-
-
-
-
-
-
-
-#######################################################
-# get options from config file
-#######################################################
-
-
-conffile = os.path.expanduser(args.file)
-config = ConfigParser.ConfigParser()
-
-# Read config file
-if os.path.isfile(conffile):
-	try:
-		config.read(conffile)
-	except:
-		print "Error reading config file " + conffile + "... exiting"
-		sys.exit()
-else:
-	print "No config file " + conffile + " found. Please create one first ... exiting" 
-	sys.exit()
-
-
-
-# forecast.io api key
-if args.key:
-	forecastioApiKey = args.key
-elif config.has_option("Settings", "forecastioApiKey"):
-	forecastioApiKey = config.get("Settings", "forecastioApiKey")
-else:
-	print "Please provide variable `forecastioApiKey` under section [Settings] in file "\
-	    + conffile + "or specify the --key command line option."
-	sys.exit()
-
-
-# latitude and longitude
-if (config.has_option(args.location, "lat") & 
-    config.has_option(args.location, "lon")):
-	lat = config.get(args.location, "lat")
-	lon = config.get(args.location, "lon")
-else:
-	print "Please provide location variables `lat` and `lon` under section [" + args.location + \
-	    "] in file " + conffile + " ... exiting"
-	sys.exit()
-
-
-# downloadIfOlder option
-# maybe it would be enough to have hard coded 120s and the forced download command line option
-if (config.has_option("Settings", "downloadIfOlder")):
-	downloadIfOlder = float(config.get("Settings", "downloadIfOlder"))
-else:
-	downloadIfOlder = 120
-
-
-# plot height
-if (config.has_option("Settings", "plotsize")):
-	plotsize = int(config.get("Settings", "plotsize"))
-else:
-	plotsize = 2
-
-
-# json filename
-if (config.has_option("Settings", "jsonFile")):
-	# the jsonFile has to contain %s in the string
-	try:
-		jsonfilename = config.get("Settings", "jsonFile") % args.location
-	except TypeError:
-		print "Please include '%s' in in the option jsonFile in the [Settings] section in the config file: " + args.file
-		
-else:
-	jsonfilename = "/tmp/forecastio"+ args.location +".json"
-
-
-
-
 
 
 
@@ -254,12 +108,174 @@ def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], xmticksat=[], pch="*"
 
 
 
+
+
+#######################################################
+# get options from command line
+#######################################################
+
+# the config file has to be created. The options specified
+# in the config file are overwriten by the comman line options.
+
+# initialize the parser
+parser = argparse.ArgumentParser(#usage="%(prog)s [options]",
+                                 description="Command line forcast.")
+
+# forecast mode
+parser.add_argument("mode",type=str, 
+		    nargs="?", 
+		    default="rain",
+                    help="forecast mode [rain | rain2 | now]")
+
+# config file
+parser.add_argument("-f",
+		    "--file", 
+		    nargs="?",
+		    type=str,
+		    default = "~/.pyfcio.conf",
+                    help="config file")
+
+# forcastio Api Key
+parser.add_argument("-k",
+		    "--key", 
+		    nargs="?", 
+		    type=str,
+		    help="user key to the forecastio database")
+
+# location key
+parser.add_argument("-l",
+		    "--location", 
+		    nargs="?", 
+		    type=str,
+		    default = "Settings",
+		    help="location defined in the config file")
+
+# force new download of the data file
+parser.add_argument("-d",
+		    "--download", 
+		    action = "store_true",
+		    help="force new download of the data file")
+
+
+# output verbosity
+parser.add_argument("-v",
+		    "--verbose",
+		    action="store_true",
+                    help="verbose output")
+
+# parse arguments into args variable.
+args = parser.parse_args()
+
+# capitalize the location
+args.location = args.location.capitalize() 
+
+
+# show what has been parsed
+if args.verbose:
+	print "Verbose mode"
+	print "---------------------------------------------------------"
+	print "The following arguments were parsed from the command line"
+	print "---------------------------------------------------------"
+	print "Config file:\t", args.file
+	print "Forecast mode:\t" , args.mode
+	print "User key:\t", args.key
+	print "Location:\t", args.location
+	print
+
+
+
+
+
+
+
+#######################################################
+# get options from config file
+#######################################################
+
+
+conffile = os.path.expanduser(args.file)
+config = ConfigParser.ConfigParser()
+
+# Read config file
+if os.path.isfile(conffile):
+	if args.verbose:
+		print "Parsing the config file options from " + args.file
+
+	try:
+		config.read(conffile)
+	except:
+		print "Error reading config file " + conffile + "... exiting"
+		sys.exit()
+else:
+	print "No config file " + conffile + " found. Please create one first ... exiting" 
+	sys.exit()
+
+
+
+# forecast.io api key
+if args.key:
+	forecastioApiKey = args.key
+elif config.has_option("Settings", "forecastioApiKey"):
+	forecastioApiKey = config.get("Settings", "forecastioApiKey")
+else:
+	print "Please provide variable `forecastioApiKey` under section [Settings] in file "\
+	    + conffile + "or specify the --key command line option."
+	sys.exit()
+
+
+# latitude and longitude
+if (config.has_option(args.location, "lat") & 
+    config.has_option(args.location, "lon")):
+	lat = config.get(args.location, "lat")
+	lon = config.get(args.location, "lon")
+else:
+	print "Please provide location variables `lat` and `lon` under section [" + args.location + \
+	    "] in file " + conffile + " ... exiting"
+	sys.exit()
+
+
+# # downloadIfOlder option
+# # maybe it would be enough to have hard coded 120s and the forced download command line option
+# if (config.has_option("Settings", "downloadIfOlder")):
+# 	downloadIfOlder = float(config.get("Settings", "downloadIfOlder"))
+# else:
+# 	downloadIfOlder = 120
+downloadIfOlder = 120
+
+
+# plot height
+if (config.has_option("Settings", "plotsize")):
+	plotsize = int(config.get("Settings", "plotsize"))
+else:
+	plotsize = 2
+
+
+# json filename
+if (config.has_option("Settings", "jsonFile")):
+	# the jsonFile has to contain %s in the string
+	try:
+		jsonfilename = config.get("Settings", "jsonFile") % args.location
+	except TypeError:
+		print "The filename jsonFile in the [Settings] section in the config file: " + args.file +\
+		    " Must include '%s'"
+		print "Using default file"
+		jsonfilename = "/tmp/forecastio"+ args.location +".json"
+		
+else:
+	jsonfilename = "/tmp/forecastio"+ args.location +".json"
+
+
+
+
+
+
+
+
 #######################################################
 # download and open json file 
 #######################################################
 
 # if file doesn't exist or it's more than `downloadIfOlder` 
-# seconds old or if the download ir forced by command line option -d
 if not (os.path.isfile(jsonfilename)) \
     or  (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder) \
     or args.download:
@@ -280,6 +296,8 @@ else:
 	# load the data from the file
 	with open(jsonfilename, 'r') as jsonFile:
 		data = json.load(jsonFile)
+
+
 
 
 
@@ -367,6 +385,7 @@ elif args.mode=="temp":
 	nytix = int((ymax - ymin) / 2.5) + 1
 
 	xtixat = []
+	xmtixat = []
 	xtix = []
 	for i,t in enumerate(fcsttime):
 		if t == "00:00":
@@ -375,11 +394,15 @@ elif args.mode=="temp":
 		if t == "12:00":
 			xtixat.append(i)
 			xtix.append(t)
+		if t == "06:00" or t == "18:00":
+			xmtixat.append(i)
+
 	
 	plotmat = txtplot(data=temp, 
 			  ylim=[ymin,ymax], 
 	                  nyticks=nytix, 
 			  yspacer=plotsize, 
+			  xmticksat = xmtixat,
 	                  xticksat=xtixat)
 
 	plotmat.insert(0, [" " for i in xrange(len(plotmat[0])+2)])
