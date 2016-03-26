@@ -38,7 +38,7 @@ Plot weather forecasts into the terminal using data from [forecast.io](www.forec
 The generic call is 
 
 ```
-./fcst.py mode
+./fcst.py [mode]
 ```
 
 where `mode` is one of the following:
