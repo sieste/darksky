@@ -125,7 +125,7 @@ parser = argparse.ArgumentParser(#usage="%(prog)s [options]",
 parser.add_argument("mode",type=str, 
 		    nargs="?", 
 		    default="rain",
-                    help="forecast mode [rain | rain2 | now]")
+                    help="forecast mode [rain | rain2 | temp | now]")
 
 # config file
 parser.add_argument("-f",
