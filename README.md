@@ -1,10 +1,11 @@
 ## pyfcio: Weather forecasts on the command line ##
 
-Quickly plot weather forecasts into your terminal. 
+Plot weather forecasts into the terminal using data from [forecast.io](www.forecast.io)
 
 
 
 ### Example and usage ###
+
 
 ```
 ./fcst.py rain2
@@ -34,7 +35,7 @@ Quickly plot weather forecasts into your terminal.
 ```
 
 
-The program is called by
+The generic call is 
 
 ```
 ./fcst.py mode
@@ -49,7 +50,7 @@ where `mode` is one of the following:
 * **temp**: temperature forecast over the next 48 hours
 * **now**: print current weather conditions
 
-For more information type
+For all command line arguments, see
 
 ```
 ./fcst.py --help
@@ -65,6 +66,6 @@ For more information type
 ### Install and config ###
 
 * clone the repository (or just download the executable `fcst.py`)
-* copy `.pyfcio.conf` to your home directory and add your forecast.io API key
+* copy `.pyfcio.conf` to your home directory and add your forecast.io API key and location 
 
 
