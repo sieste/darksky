@@ -10,7 +10,7 @@
 ### Install and config ###
 
 * clone the repository (or just download the executable `fcst.py`)
-* copy `.pyfcio.conf` to home directory and add your forecast.io API key
+* copy `.pyfcio.conf` to your home directory and add your forecast.io API key
 
 
 
