@@ -119,7 +119,7 @@ def txtplot(data, ylim, nyticks=2, yspacer=3, xticksat=[], xmticksat=[], pch="*"
 
 # initialize the parser
 parser = argparse.ArgumentParser(#usage="%(prog)s [options]",
-                                 description="Command line forcast.")
+                                 description="Command line weather forcasts using the forecast.io api.")
 
 # forecast mode
 parser.add_argument("mode",type=str, 
@@ -140,7 +140,7 @@ parser.add_argument("-k",
 		    "--key", 
 		    nargs="?", 
 		    type=str,
-		    help="user key to the forecastio database")
+		    help="api key to the forecast.io database")
 
 # location key
 parser.add_argument("-l",
@@ -234,16 +234,11 @@ else:
 	sys.exit(1)
 
 
-# # downloadIfOlder option
-# # maybe it would be enough to have hard coded 120s and the forced download command line option
-# if (config.has_option("Settings", "downloadIfOlder")):
-# 	downloadIfOlder = float(config.get("Settings", "downloadIfOlder"))
-# else:
-# 	downloadIfOlder = 120
+# only download new json file if existing file is older than 2 minutes
 downloadIfOlder = 120
 
 
-# plot height
+# plot height (the number of terminal lines between two y-axis ticks)
 if (config.has_option("Settings", "plotsize")):
 	plotsize = int(config.get("Settings", "plotsize"))
 else:
@@ -275,7 +270,7 @@ else:
 # download and open json file 
 #######################################################
 
-# if file doesn't exist or it's more than `downloadIfOlder` 
+# if file doesn't exist or it's more than `downloadIfOlder` seconds old
 if not (os.path.isfile(jsonfilename)) \
     or  (time.time() - os.path.getmtime(jsonfilename) > downloadIfOlder) \
     or args.download:
