@@ -1,20 +1,10 @@
-## pyfcio: Command line weather forecasts from forecast.io ##
+## pyfcio: Weather forecasts on the command line ##
 
-
-### Requirements ###
-
-* Python2
-* a forecast.io API Key (register [here](https://developer.forecast.io/register))
-
-
-### Install and config ###
-
-* clone the repository (or just download the executable `fcst.py`)
-* copy `.pyfcio.conf` to your home directory and add your forecast.io API key
+Quickly plot weather forecasts into your terminal. 
 
 
 
-### Example ###
+### Example and usage ###
 
 ```
 ./fcst.py rain2
@@ -44,7 +34,7 @@
 ```
 
 
-### Usage ###
+The program is called by
 
 ```
 ./fcst.py mode
@@ -66,3 +56,15 @@ For more information type
 ```
 
  
+### Requirements ###
+
+* Python2
+* a forecast.io API Key (register [here](https://developer.forecast.io/register))
+
+
+### Install and config ###
+
+* clone the repository (or just download the executable `fcst.py`)
+* copy `.pyfcio.conf` to your home directory and add your forecast.io API key
+
+
