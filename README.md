@@ -1,67 +1,25 @@
 ## pyfcio: Command line weather forecasts from forecast.io ##
 
+
 ### Requirements ###
 
 * Python2
 * a forecast.io API Key (register [here](https://developer.forecast.io/register))
-* tested under Arch Linux (3.12.7)
+
 
 ### Install and config ###
 
-* clone the repository or download the executable `fcst.py` 
-* create the file `.pyfcio.conf` in your home directory with the following options (adjusted to your location):
-
-```
-[Settings]
-forecastioApiKey: yOUr_foRecAST_dOt_Io_Api_Key
-jsonFile: /tmp/forecastio%s.json
-
-# kept for backwards compatibility
-rainheader: Probability of precipitation for Exeter, Devon, UK
-lat: 50.7166 
-lon: -3.5333
-
-[Exeter]
-lat: 50.7166
-lon: -3.5333
-
-[Dresden]
-lat: 51.051754
-lon: 13.728561
-
-[Bilovec]
-lat: 49.756429
-lon: 18.015404
-```
+* clone the repository (or just download the executable `fcst.py`)
+* copy `.pyfcio.conf` to home directory and add forecast.io API key
 
 
 
-### Usage ###
-
-```
-./fcst.py mode
-```
-
-The following modes are currently implemented
-
-* **rain**: probability of precipitation over the next 60 minutes
-* **rain2**: probability of precipitation over the next 48 hours
-* the markers indicate intensity of precipitation:
-    + `.` 0 - 1 mm/h
-    + `o` 1 - 2 mm/h
-    + `X` 2 - 5 mm/h
-    + `#`   > 5 mm/h
-* **temp**: temperature forecast over the next 48 hours
-* **now**: print current weather conditions
-
-
-For example, the command
+### Example ###
 
 ```
 ./fcst.py rain2
 ```
 
-will produce output similar to
 
 ```
 
@@ -85,4 +43,22 @@ will produce output similar to
 
 ```
 
+
+### Usage ###
+
+```
+./fcst.py mode
+```
+
+The following modes are currently implemented
+
+* **rain**: probability of precipitation over the next 60 minutes (not available in all locations)
+* **rain2**: probability of precipitation over the next 48 hours
+* the markers indicate intensity of precipitation:
+  + `.` 0 - 1 mm/h
+  + `o` 1 - 2 mm/h
+  + `X` 2 - 5 mm/h
+  + `#`   > 5 mm/h
+* **temp**: temperature forecast over the next 48 hours
+* **now**: print current weather conditions
 
