@@ -10,7 +10,7 @@
 ### Install and config ###
 
 * clone the repository (or just download the executable `fcst.py`)
-* copy `.pyfcio.conf` to home directory and add forecast.io API key
+* copy `.pyfcio.conf` to home directory and add your forecast.io API key
 
 
 
@@ -50,7 +50,7 @@
 ./fcst.py mode
 ```
 
-The following modes are currently implemented
+where `mode` is one of the following:
 
 * **rain**: probability of precipitation over the next 60 minutes (not available in all locations)
 * **rain2**: probability of precipitation over the next 48 hours
@@ -62,3 +62,10 @@ The following modes are currently implemented
 * **temp**: temperature forecast over the next 48 hours
 * **now**: print current weather conditions
 
+For more information type
+
+```
+./fcst.py --help
+```
+
+ 
