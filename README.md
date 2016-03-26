@@ -55,10 +55,7 @@ where `mode` is one of the following:
 * **rain**: probability of precipitation over the next 60 minutes (not available in all locations)
 * **rain2**: probability of precipitation over the next 48 hours
 * the markers indicate intensity of precipitation:
-  + `.` 0 - 1 mm/h
-  + `o` 1 - 2 mm/h
-  + `X` 2 - 5 mm/h
-  + `#`   > 5 mm/h
+   `.` 0 - 1 mm/h | `o` 1 - 2 mm/h | `X` 2 - 5 mm/h | `#`   > 5 mm/h
 * **temp**: temperature forecast over the next 48 hours
 * **now**: print current weather conditions
 
