@@ -1,6 +1,7 @@
-## pyfcio: Weather forecasts on the command line ##
+## `darksky`: Command line weather forecasts 
 
-Plot weather forecasts into the terminal using data from [forecast.io](www.forecast.io)
+Plot weather forecast charts into the command line terminal. **Powered by [Dark Sky](https://darksky.net/poweredby)**
+
 
 
 
@@ -8,7 +9,7 @@ Plot weather forecasts into the terminal using data from [forecast.io](www.forec
 
 
 ```
-./fcst.py rain2
+./darksky rain2
 ```
 
 
@@ -30,7 +31,6 @@ Plot weather forecasts into the terminal using data from [forecast.io](www.forec
 0.0  :....................             .             . :
       -----------|-----------|-----------|-----------|- 
                 Tue         12:00       Wed         12:00 
-                                  (src: www.forecast.io)
 
 ```
 
@@ -38,7 +38,7 @@ Plot weather forecasts into the terminal using data from [forecast.io](www.forec
 The generic call is 
 
 ```
-./fcst.py [mode]
+./darksky [mode]
 ```
 
 where `mode` is one of the following:
@@ -53,19 +53,19 @@ where `mode` is one of the following:
 For all command line arguments, see
 
 ```
-./fcst.py --help
+./darksky --help
 ```
 
  
 ### Requirements ###
 
 * Python2
-* a forecast.io API Key (register [here](https://developer.forecast.io/register))
+* a darksky.net API key (get one at [darksky.net/dev](https://darksky.net/dev))
 
 
 ### Install and config ###
 
-* clone the repository (or just download the executable `fcst.py`)
-* copy `.pyfcio.conf` to your home directory and add your forecast.io API key and location 
+* clone the repository (or just download the executable `darksky`)
+* copy the file [darksky.conf](darksky.conf) to `~/.darksky.conf` and add your darksky.net API key and location data
 
 
