@@ -65,7 +65,7 @@ For all command line arguments, see
 
 ### Install and config ###
 
-* clone the repository (or just download the executable `darksky`)
+* clone the repository (or just download the [darksky](darksky) python script)
 * copy the file [darksky.conf](darksky.conf) to `~/.darksky.conf` and add your darksky.net API key and location data
 
 
