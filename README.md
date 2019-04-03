@@ -60,12 +60,14 @@ For all command line arguments, see
 ### Requirements ###
 
 * Python2
+* for a limited number of queries API key is not required for continuous use
 * a darksky.net API key (get one at [darksky.net/dev](https://darksky.net/dev))
 
 
 ### Install and config ###
 
 * clone the repository (or just download the [darksky](darksky) python script)
-* copy the file [darksky.conf](darksky.conf) to `~/.darksky.conf` and add your darksky.net API key and location data
+* the configuration will be writen at the first launch of the program to `~/.darksky.conf` when you also need to fill the location data and optionaly the API key
+
 
 
