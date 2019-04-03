@@ -11,6 +11,12 @@ import os
 import math
 
 
+def writeConfig(config, conffile):
+        '''write the config file into the specified conffile'''
+        with open(conffile, 'wb') as configfile:
+                config.write(configfile)
+
+
 ##################################################
 # Conversion of the units
 ##################################################
@@ -192,7 +198,6 @@ if args.verbose:
 # get options from config file
 #######################################################
 
-
 conffile = os.path.expanduser(args.file)
 config = ConfigParser.ConfigParser()
 
@@ -207,10 +212,19 @@ if os.path.isfile(conffile):
 		print "Error reading config file " + conffile + "... exiting"
 		sys.exit(1)
 else:
-	print "No config file " + conffile + " found. Please create one first ... exiting" 
-	sys.exit(1)
+	print "No config file " + conffile + " found. Intializing from defaults ..." 
+        print
 
+        defaultConfig = {
+                'jsonFile': '/tmp/darksky%s.json',
+                'plotsize': '2',
+        }
 
+        config.add_section('Settings')
+        for key, value in defaultConfig.iteritems():
+                config.set('Settings',key,'%s' % value)
+
+        writeConfig(config, conffile)
 
 # read darksky.net secret api key
 if args.key:
@@ -218,9 +232,16 @@ if args.key:
 elif config.has_option("Settings", "apiKey"):
 	apiKey = config.get("Settings", "apiKey")
 else:
-	print "Please provide variable `apiKey` under section [Settings] in file "\
-	    + conffile + "or specify the --key command line option."
-	sys.exit(1)
+        print "Darksky secret API key not found (from https://darksky.net/dev)."
+        print
+
+        apiKey = raw_input('Please enter your apiKey, or press Enter to continue without: ')
+
+        if apiKey:
+                config.set('Settings', 'apiKey', apiKey)
+                writeConfig(config, conffile)
+
+                print "provided apiKey was added to your config file " + conffile
 
 
 # latitude and longitude
@@ -229,10 +250,19 @@ if (config.has_option(args.location, "lat") &
 	lat = config.get(args.location, "lat")
 	lon = config.get(args.location, "lon")
 else:
-	print "Please provide location variables `lat` and `lon` under section [" + args.location + \
-	    "] in file " + conffile + " ... exiting"
-	sys.exit(1)
+        try:
+                config.add_section(args.location)
+        except:
+                pass
 
+        print "Please enter geografic coordinates for " + args.location + "."
+        lat = raw_input('Latitude:  ')
+        lon = raw_input('Longitude: ')
+
+        config.set(args.location, 'lat', lat)
+        config.set(args.location, 'lon', lon)
+
+        writeConfig(config, conffile)
 
 # only download new json file if existing file is older than 2 minutes
 downloadIfOlder = 120
@@ -283,7 +313,12 @@ if not (os.path.isfile(jsonfilename)) \
 	try:
  		response = urllib2.urlopen(url)
 	except:
-		print "Connection failed."
+                print
+		print "You might have exceeded the quota of API requests."
+                print "Try again later or register at https://darksky.net/dev and"
+                print "enter obtained apiKey when prompted."
+                print
+		print "Error: Connection failed."
 		sys.exit(1)
  	fcstData = response.read()
 	
